@@ -1,0 +1,20 @@
+{
+  "name": "cashcodejs",
+  "version": "1.0.0",
+  "description": "Library for working with cashcode",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/themaltsev/cashcodejs.git"
+  },
+  "author": "themaltsev",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/themaltsev/cashcodejs/issues"
+  },
+  "homepage": "https://github.com/themaltsev/cashcodejs#readme",
+  "dependencies": {
+    "express": "^4.18.2",
+    "serialport": "^12.0.0"
+  }
+}
