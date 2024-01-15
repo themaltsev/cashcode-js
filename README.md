@@ -1,5 +1,7 @@
 Самая свежая на сегодня 15.01.2024 
 
+// Модифицированый код - https://github.com/richxcame/cashcodejs
+
 библиотека по работе с купюроприёмниками CashCode
 
 Зависимости serialport и express 
