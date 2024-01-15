@@ -1,4 +1,4 @@
-Самая и рабочая версия свежая на 15.01.2024 
+Самая и рабочая версия свежая на 15.01.2024 by Aleksandr Maltsev
 
 Модифицированый код - https://github.com/richxcame/cashcodejs
 
