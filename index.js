@@ -6,30 +6,32 @@ const express = require('express');
 const app = express() // Экземпляр сервера
 const PORT = 4000 // port backend
 let started = false // isStart
+let priemCash
 let cashResult = 0 // Start money
 let debug = true // or false for off debug
 
 app.listen(PORT, ()=>{
-	console.log("Server work!!!");
+	console.log("Server started  http://localhost:4000/");
 })
 
-app.get('/getUpdate', (req, res) => {
+app.get('/update', (req, res) => {
 	res.setHeader('Access-Control-Allow-Origin', '*');
 	res.send(`${cashResult}`)
 })
 
 app.get('/', (req, res) => {
 	res.setHeader('Access-Control-Allow-Origin', '*');
-	res.send(`Started!`)
+	res.send(`Accepting Started!`)
 	cashResult = 0
-	started = true
+	started = false
 	AcceptBills()
 })
 
-app.get('/kill', (req, res) => {
-	res.setHeader('Access-Control-Allow-Origin', '*');
-	res.send(`Finish!`)
+app.get('/stop', (req, res) => {
+	cashResult = 0
 	AcceptStop()
+	res.setHeader('Access-Control-Allow-Origin', '*');
+	res.send(`Accepting Stoped!`)
 	// Чтобы завершить процесс с последующим перезапуском  
 	// npm i pm2 
 	// pm2 start index.js --watch
@@ -43,36 +45,38 @@ const device = new BillValidator({
 	path: 'COM1',
 });
 
+device.connect()
+
+priemCash = setInterval( () => {
+	if(started) device.start()
+}, 999)
+
 // Функция запуска
 function AcceptBills(){
-	device.connect()
-	priemCash = setInterval(() => device.start(), 999)
+	started = true
+	// console.log('started', started);
 }
 
 // Функция остановки
-function AcceptStop(){
-	clearInterval(priemCash)
-	device.close()
-	setTimeout(() =>device.disconnect(), 0);
+function  AcceptStop(){
 	started = false
+	// console.log('started', started);
 }
 
 /* Device handle disable event */
-device.on('disabled', ()=>{
-	if(debug) console.log('Device disable');
-});
+// device.on('disabled', ()=>{
+// 	if(debug) console.log('Device disable');
+// });
 
 /* Get device status functions*/
 device.on('error', (error) => {
 	if(debug) console.log('Device error:', error);
-	AcceptStop()
-	AcceptBills()
 	// process.exit()
 });
 
 device.on('status', (sts) => {
-	if(debug) console.log('Status:', sts, `cash = ${cashRes}`);
-	if(sts == 80 || sts == 11 || sts == 43) device.stack()
+	if(debug) console.log('Status:', sts, `cash: ${cashResult} started: ${started}`);
+	if(sts == 80 || sts == 43) device.stack()
 });
 
 /* Get device real-time information */
@@ -93,7 +97,7 @@ device.on('initialize', () => {
 });
 
 device.on('idling', () => {
-	if(debug) console.log('Device on idling state');
+	// if(debug) console.log('Device on idling state');
 });
 
 device.on('cassetteRemoved', () => {
