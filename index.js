@@ -6,29 +6,35 @@ const express = require('express');
 const app = express() // Экземпляр сервера
 const PORT = 4000 // port backend
 let started = false // isStart
+let priemCash
 let cashResult = 0 // Start money
 let debug = true // or false for off debug
 
 app.listen(PORT, ()=>{
-	console.log("Server work!!!");
+	console.log("Server started  http://localhost:4000/");
 })
 
-app.get('/getUpdate', (req, res) => {
+app.get('/update', (req, res) => {
 	res.setHeader('Access-Control-Allow-Origin', '*');
 	res.send(`${cashResult}`)
 })
 
+app.get('/reset', (req, res) => {
+	res.setHeader('Access-Control-Allow-Origin', '*');
+	res.send(`Reset Accepting`)
+})
+
 app.get('/', (req, res) => {
 	res.setHeader('Access-Control-Allow-Origin', '*');
-	res.send(`Started!`)
+	res.send(`Accepting Started!`)
 	cashResult = 0
-	started = true
+	started = false
 	AcceptBills()
 })
 
-app.get('/kill', (req, res) => {
+app.get('/stop', (req, res) => {
 	res.setHeader('Access-Control-Allow-Origin', '*');
-	res.send(`Finish!`)
+	res.send(`Accepting Stoped!`)
 	AcceptStop()
 	// Чтобы завершить процесс с последующим перезапуском  
 	// npm i pm2 
@@ -45,16 +51,25 @@ const device = new BillValidator({
 
 // Функция запуска
 function AcceptBills(){
+	if(started) return
 	device.connect()
 	priemCash = setInterval(() => device.start(), 999)
+	started = true
 }
 
 // Функция остановки
 function AcceptStop(){
-	clearInterval(priemCash)
-	device.close()
-	setTimeout(() =>device.disconnect(), 0);
-	started = false
+	if(started){
+		clearInterval(priemCash)
+		setTimeout(() =>device.disconnect(), 0);
+		started = false
+		console.log('STOP');
+	}
+}
+
+function AcceptReset(){
+	AcceptStop()
+	setTimeout(() => AcceptBills(), 100);
 }
 
 /* Device handle disable event */
@@ -65,14 +80,13 @@ device.on('disabled', ()=>{
 /* Get device status functions*/
 device.on('error', (error) => {
 	if(debug) console.log('Device error:', error);
-	AcceptStop()
-	AcceptBills()
+	AcceptReset()
 	// process.exit()
 });
 
 device.on('status', (sts) => {
-	if(debug) console.log('Status:', sts, `cash = ${cashResult}`);
-	if(sts == 80 || sts == 11 || sts == 43) device.stack()
+	if(debug) console.log('Status:', sts, `cash: ${cashResult} started: ${started}`);
+	if(sts == 80 || sts == 43) device.stack()
 });
 
 /* Get device real-time information */
