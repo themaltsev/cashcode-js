@@ -48,8 +48,8 @@ const device = new BillValidator({
 device.connect()
 
 priemCash = setInterval( () => {
-	if(started) device.start()
-}, 999)
+	if(started)device.start()
+}, 900)
 
 // Функция запуска
 function AcceptBills(){
@@ -71,7 +71,7 @@ function  AcceptStop(){
 /* Get device status functions*/
 device.on('error', (error) => {
 	if(debug) console.log('Device error:', error);
-	// process.exit()
+	process.exit()
 });
 
 device.on('status', (sts) => {
