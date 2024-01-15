@@ -1,6 +1,6 @@
-Самая свежая на сегодня 15.01.2024 
+Самая и рабочая версия свежая на 15.01.2024 
 
-// Модифицированый код - https://github.com/richxcame/cashcodejs
+Модифицированый код - https://github.com/richxcame/cashcodejs
 
 библиотека по работе с купюроприёмниками CashCode
 
