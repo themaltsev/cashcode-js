@@ -13,12 +13,12 @@ app.listen(PORT, ()=>{
 	console.log("Server work!!!");
 })
 
-app.get('/refresh', (req, res) => {
+app.get('/getUpdate', (req, res) => {
 	res.setHeader('Access-Control-Allow-Origin', '*');
 	res.send(`${cashResult}`)
 })
 
-app.get('/start', (req, res) => {
+app.get('/', (req, res) => {
 	res.setHeader('Access-Control-Allow-Origin', '*');
 	res.send(`Started!`)
 	cashResult = 0
@@ -26,7 +26,7 @@ app.get('/start', (req, res) => {
 	AcceptBills()
 })
 
-app.get('/stop', (req, res) => {
+app.get('/kill', (req, res) => {
 	res.setHeader('Access-Control-Allow-Origin', '*');
 	res.send(`Finish!`)
 	AcceptStop()
@@ -35,7 +35,6 @@ app.get('/stop', (req, res) => {
 	// pm2 start index.js --watch
 	// process.exit()
 })
-
 
 const device = new BillValidator({
 	//Скорость передачи 9600 или 19200
@@ -54,9 +53,7 @@ function AcceptBills(){
 function AcceptStop(){
 	clearInterval(priemCash)
 	device.close()
-	setTimeout(() => {
-		device.disconnect()
-	}, 0);
+	setTimeout(() =>device.disconnect(), 0);
 	started = false
 }
 
@@ -68,6 +65,8 @@ device.on('disabled', ()=>{
 /* Get device status functions*/
 device.on('error', (error) => {
 	if(debug) console.log('Device error:', error);
+	AcceptStop()
+	AcceptBills()
 	// process.exit()
 });
 
