@@ -71,7 +71,7 @@ device.on('error', (error) => {
 });
 
 device.on('status', (sts) => {
-	if(debug) console.log('Status:', sts, `cash = ${cashRes}`);
+	if(debug) console.log('Status:', sts, `cash = ${cashResult}`);
 	if(sts == 80 || sts == 11 || sts == 43) device.stack()
 });
 
